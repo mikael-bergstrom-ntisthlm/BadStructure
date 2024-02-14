@@ -1,12 +1,26 @@
-﻿string place = "start";
+﻿
+/* -----------------------------------------------------------------------------
+      VARIABLER
+------------------------------------------------------------------------------*/
 
+
+#region WORLD STATE
+string place = "start";
+
+
+
+bool fightHappened = false;
+#endregion
+
+#region PLAYER STATS
 int Money = 0;
 bool isAlive = true;
-bool fightHappened = false;
-
 List<string> inventory = new List<string>();
-string go = "";
+#endregion
 
+/* -----------------------------------------------------------------------------
+      MAIN LOOP
+------------------------------------------------------------------------------*/
 while (place != "exit" && isAlive)
 {
   Console.WriteLine($"Your balance is: {Money} valuables");
@@ -16,29 +30,17 @@ while (place != "exit" && isAlive)
     Console.WriteLine("You stink of filth.");
   }
 
+  /* -----------------------------------------------------------------------------
+        RUM: START
+  ------------------------------------------------------------------------------*/
   if (place == "start")
   {
-    Console.WriteLine("Your name is XF344 and you are currently in the docking station of the allied forces ship, there is a door ahead of you leading to the wheelhouse.");
-    Console.WriteLine("You hear a robotic voice say: If you want to enter, state your ID out loud, Robot.");
-    Console.WriteLine("{Btw when you enter prompts later on you will want to enter them when the terminal says your current valuables.}");
-    Console.WriteLine("Go full screen for best experience.");
-    go = Console.ReadLine();
-    go = go.ToLower();
-
-    if (go == "xf344")
-    {
-      place = "wheelhouse";
-    }
-
-    else if (go != "xf344")
-    {
-      place = "start";
-      Console.WriteLine("That isn't a registered ID, Who are you? The robot voice exclaims.");
-      Console.ReadLine();
-
-    }
-
+    place = Rooms.StartRoom(place);
   }
+
+  /* -----------------------------------------------------------------------------
+        RUM: WHEELHOUSE
+  ------------------------------------------------------------------------------*/
 
   if (place == "wheelhouse")
   {
@@ -61,43 +63,7 @@ while (place != "exit" && isAlive)
     {
       place = "hallway";
 
-      Random generator = new Random();
-
-      int health = 100;
-      int fighter1Health = health;
-      int fighter2Health = health;
-
-      while (fighter1Health > 0 && fighter2Health > 0)
-      {
-        int damage = generator.Next(1, 20);
-        fighter1Health -= damage;
-
-        damage = generator.Next(1, 200);
-        fighter2Health -= damage;
-
-        Console.WriteLine($"Fighter 1 health {fighter1Health}");
-        Console.WriteLine($"Fighter 2 health {fighter2Health}");
-        Console.ReadLine();
-
-        if (fighter1Health < 0)
-        {
-          Console.WriteLine("Fighter 2 wins");
-          Console.ReadLine();
-
-          Console.ReadLine();
-
-          isAlive = false;
-        }
-
-        else if (fighter2Health < 0)
-        {
-          Console.WriteLine("fighter 1 wins");
-          Console.ReadLine();
-
-          Console.ReadLine();
-          isAlive = true;
-        }
-      }
+      isAlive = Fight();
 
       fightHappened = true;
     }
@@ -107,26 +73,30 @@ while (place != "exit" && isAlive)
       place = "wheelhouse";
     }
   }
+
+  /* -----------------------------------------------------------------------------
+        RUM: HALLWAY
+  ------------------------------------------------------------------------------*/
   if (fightHappened && place == "hallway")
   {
     if (isAlive == true)
     {
       Console.WriteLine("You defeated the enemy. Go to the next are? Choices: Yes, No, Back");
     }
-    string choice2 = Console.ReadLine();
-    choice2 = choice2.ToLower();
+    string choice = Console.ReadLine();
+    choice = choice.ToLower();
 
-    if (choice2 == "yes")
+    if (choice == "yes")
     {
       place = "vendingRoom";
       Money += 100;
     }
-    else if (choice2 == "no")
+    else if (choice == "no")
     {
       place = "hallway";
     }
 
-    else if (choice2 == "back")
+    else if (choice == "back")
     {
       place = "wheelhouse";
     }
@@ -231,4 +201,48 @@ while (place != "exit" && isAlive)
       place = "escapepod";
     }
   }
+}
+
+
+static bool Fight()
+{
+  Random generator = new Random();
+
+  int health = 100;
+  int fighter1Health = health;
+  int fighter2Health = health;
+  bool isAlive = true;
+
+  while (fighter1Health > 0 && fighter2Health > 0)
+  {
+    int damage = generator.Next(1, 20);
+    fighter1Health -= damage;
+
+    damage = generator.Next(1, 200);
+    fighter2Health -= damage;
+
+    Console.WriteLine($"Fighter 1 health {fighter1Health}");
+    Console.WriteLine($"Fighter 2 health {fighter2Health}");
+    Console.ReadLine();
+
+    if (fighter1Health < 0)
+    {
+      Console.WriteLine("Fighter 2 wins");
+      Console.ReadLine();
+
+      Console.ReadLine();
+
+      isAlive = false;
+    }
+
+    else if (fighter2Health < 0)
+    {
+      Console.WriteLine("fighter 1 wins");
+      Console.ReadLine();
+
+      Console.ReadLine();
+      isAlive = true;
+    }
+  }
+  return isAlive;
 }
